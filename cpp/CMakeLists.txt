@@ -10,7 +10,7 @@ find_package(Arrow REQUIRED)
 # Find Pyarrow includes
 execute_process(COMMAND python3 -c "import pyarrow; print(pyarrow.get_include())" 
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PYARROW_INCLUDE_DIR)
-execute_process(COMMAND python3 -c "import pyarrow; print(pyarrow.get_library_dirs())" 
+execute_process(COMMAND python3 -c "import pyarrow; print(pyarrow.get_library_dirs()[0])" 
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE PYARROW_LIBRARY_DIR)
 
 # Add include directories
@@ -22,11 +22,11 @@ include_directories(
 
 
 # Add the source file
-pybind11_add_module(arrow_test pybind_test.cpp)
+pybind11_add_module(pybind11_test pybind_test.cpp)
 
 # Link against pybind11 and Arrow
-target_link_libraries(arrow_test PRIVATE
+target_link_libraries(pybind11_test PRIVATE
   pybind11::pybind11
-  Arrow::arrow_static
-  /usr/local/lib/python3.10/dist-packages/pyarrow/libarrow_python.so
+  Arrow::arrow_shared
+  ${PYARROW_LIBRARY_DIR}/libarrow_python.so
 )

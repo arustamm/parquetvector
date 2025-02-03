@@ -3,6 +3,7 @@
 #include <arrow/api.h>
 #include <arrow/result.h>
 #include <pybind11/pybind11.h>
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -29,13 +30,16 @@ std::shared_ptr<arrow::Table> create_arrow_table() {
   return arrow::Table::Make(schema, {int_array, str_array});
 }
 
-py::object table_to_pyarrow(const std::shared_ptr<arrow::Table>& table) {
+py::object table_to_pyarrow() {
   // Acquire the GIL (Global Interpreter Lock) 
   py::gil_scoped_acquire acquire; 
 
+  // Import PyArrow
+  arrow::py::import_pyarrow(); 
+
+  std::shared_ptr<arrow::Table> table = create_arrow_table();
   // Convert the Arrow C++ Table to a PyArrow Table object
   PyObject* table_obj = arrow::py::wrap_table(table);
-
   // Create a pybind11::object from the PyObject*
   return py::reinterpret_steal<py::object>(table_obj);
 }
